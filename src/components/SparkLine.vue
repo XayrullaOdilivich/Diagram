@@ -1,91 +1,99 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import VueApexCharts from "vue3-apexcharts"
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const pointCount = 30
-const initialValue = 20
-const initialData = Array.from({ length: pointCount }, () => initialValue)
+const canvasRef = ref(null)
+let ctx
+const width = 300
+const height = 80
+const points = []
+const maxPoints = 50
+let animationFrameId
 
-const series = ref([{
-    name: 'Growth',
-    data: initialData
-}])
+function getRandomY(lastY) {
+    let change = Math.floor(Math.random() * 60) - 30
+    let newY = lastY + change
+    if (newY < 10) newY = 10
+    if (newY > height - 10) newY = height - 10
+    return newY
+}
 
-const chartOptions = ref({
-    chart: {
-        type: 'line',
-        sparkline: { enabled: true },
-        animations: {
-            enabled: true,
-            easing: 'linear',
-            speed: 400,
-            dynamicAnimation: {
-                enabled: true,
-                speed: 300
-            }
-        }
-    },
-    stroke: {
-        curve: 'straight',
-        width: 2
-    },
-    colors: ['#8884d8'],
-    tooltip: { enabled: false },
-    markers: {
-        size: [ ...Array(pointCount - 1).fill(0), 6 ], // faqat oxirgi nuqtada marker bo'ladi
-        colors: [],
-        strokeColors: '#000',
-        strokeWidth: 2
-    },
-    yaxis: {
-        min: 10,  // Y-aksisining minimal qiymati
-        max: 40,  // Y-aksisining maksimal qiymati
+function draw() {
+    ctx.clearRect(0, 0, width, height)
+
+    // Pastki bo'limni yashil shaffof rang bilan to'ldirish
+    ctx.beginPath()
+    ctx.moveTo(0, points[0])
+    for (let i = 1; i < points.length; i++) {
+        let x = (i / maxPoints) * width
+        ctx.lineTo(x, points[i])
     }
-})
+    ctx.lineTo(width, height)        // oxirgi nuqtadan pastga tush
+    ctx.lineTo(0, height)            // chap pastki burchakka chiz
+    ctx.closePath()
+    ctx.fillStyle = 'rgba(0, 227, 150, 0.15)' // yashil shaffof fon
+    ctx.fill()
 
-let intervalId
+    // Egri chiziqni chizish
+    ctx.beginPath()
+    ctx.moveTo(0, points[0])
+    for (let i = 1; i < points.length; i++) {
+        let x = (i / maxPoints) * width
+        ctx.lineTo(x, points[i])
+    }
+    ctx.strokeStyle = '#00e396'  // chiziq rangi
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Nuqta (oxirgisi)
+    const lastY = points[points.length - 1]
+    const prevY = points[points.length - 2]
+    ctx.beginPath()
+    ctx.arc(width, lastY, 4, 0, Math.PI * 2)
+    ctx.fillStyle = lastY < prevY ? '#00e396' : '#ff4d4f'
+    ctx.fill()
+}
+
+function update() {
+    const lastY = points[points.length - 1] || height / 2
+    const newY = getRandomY(lastY)
+    points.push(newY)
+    if (points.length > maxPoints) {
+        points.shift()
+    }
+
+    draw()
+    animationFrameId = requestAnimationFrame(() => {
+        setTimeout(update, 400)
+    })
+}
 
 onMounted(() => {
-    intervalId = setInterval(() => {
-        const currentData = [...series.value[0].data]
+    const canvas = canvasRef.value
+    canvas.width = width
+    canvas.height = height
+    ctx = canvas.getContext('2d')
 
-        // Yangi random qiymat, farqni kichik qilamiz (max -min = 3 masalan)
-        const delta = Math.floor(Math.random() * 7) - 3  // 0 va 3 orasida o'zgarish
-        const prevValue = currentData[currentData.length - 1]
-        const newValue = prevValue + delta
+    // boshlanishda egri chiziq yasash uchun tasodifiy qiymatlar bilan to‘ldiramiz
+    for (let i = 0; i < maxPoints; i++) {
+        const lastY = points.length > 0 ? points[points.length - 1] : height / 2
+        points.push(getRandomY(lastY))
+    }
 
-        // O'zgarishlar kichikroq bo'lishi kerak
-        if (newValue < 10) return // minimal qiymatdan pastga tushmasin
-        if (newValue > 40) return // maksimal qiymatdan oshmasin
-
-        currentData.shift()
-        currentData.push(newValue)
-
-        // Nuqta yuqoriga ketdimi yoki pastgami?
-        const lastDotColor = newValue > prevValue ? '#00e396' : '#ff4560'
-
-        chartOptions.value.markers.colors = [
-            ...Array(pointCount - 1).fill('transparent'), // qolgan nuqtalar ko‘rinmaydi
-            lastDotColor
-        ]
-
-        series.value = [{
-            name: 'Growth',
-            data: currentData
-        }]
-    }, 1000)
+    update()
 })
 
-onBeforeUnmount(() => {
-    clearInterval(intervalId)
+onUnmounted(() => {
+    cancelAnimationFrame(animationFrameId)
 })
 </script>
 
 <template>
-    <apexchart
-        type="line"
-        height="100%"
-        :options="chartOptions"
-        :series="series"
-    />
+    <canvas ref="canvasRef" style="width: 100%; height: 100%; display: block;" />
 </template>
+
+<style scoped>
+canvas {
+    background-color: #161a26;
+    border-radius: 6px;
+}
+</style>

@@ -2,6 +2,10 @@
 import { ref } from 'vue'
 import { GridLayout, GridItem } from 'vue3-grid-layout'
 import SparkLineChart from '@/components/SparkLine.vue'
+import SpiralChart from '@/components/SpiralChart.vue'
+import LineChart from "@/components/LineChart.vue"
+import BarChart from "@/components/BarChart.vue";
+
 
 
 const layout = ref([
@@ -39,7 +43,10 @@ const layout = ref([
                     <div class="border">
                         <div class="block-header">{{ item.name }}</div>
                         <div class="block-body">
-                            <SparkLineChart v-if="item.i === '1'" />
+                            <SparkLineChart v-if="item.i === '1'" :id="item.i" />
+                            <SpiralChart v-if="item.i === '2'" :id="item.i" />
+                            <LineChart v-if="item.i === '3'" :id="item.i" />
+                            <BarChart v-if="item.i === '4'" :id="item.i" />
                         </div>
                     </div>
                 </GridItem>
@@ -83,6 +90,7 @@ const layout = ref([
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 0;
 }
 
 </style>
