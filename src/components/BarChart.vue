@@ -8,6 +8,7 @@ const yValues = [-100, -50, 0, 50, 100]
 const svgRef = ref(null)
 const svgWidth = ref(400)
 const svgHeight = ref(200)
+const containerRef = ref(null)
 
 const getX = (i, width) => {
     const totalWidth = width - padding * 2
@@ -21,7 +22,6 @@ const getY = (val, height) => {
     return padding + ((maxVal - val) / range) * (height - padding * 2)
 }
 
-// Bar diagramma uchun hisob-kitoblar
 const barWidth = computed(() => {
     const totalWidth = svgWidth.value - padding * 2
     return (totalWidth / data.length) / 2.5
@@ -40,9 +40,34 @@ const getBarHeight = (val, height) => {
     return Math.abs(zeroY - valY)
 }
 
-const linePoints = computed(() => {
-    return data.map((val, i) => `${getX(i + 1, svgWidth.value)},${getY(val, svgHeight.value)}`).join(' ')
-})
+const tooltip = ref({ show: false, x: 0, y: 0, value: null })
+
+const showTooltipFromIndex = (i, val) => {
+    if (!svgRef.value || !containerRef.value) return
+
+    const svgRect = svgRef.value.getBoundingClientRect()
+    const containerRect = containerRef.value.getBoundingClientRect()
+
+    // SVG ichidagi nuqta koordinatalari
+    const svgX = getX(i + 1, svgWidth.value)
+    const svgY = getY(val, svgHeight.value)
+
+    // SVG viewBox transformatsiyasini hisobga olish
+    const scaleX = svgRect.width / svgWidth.value
+    const scaleY = svgRect.height / svgHeight.value
+
+    // Container nisbatida pozitsiya
+    tooltip.value = {
+        show: true,
+        x: (svgX * scaleX) + (svgRect.left - containerRect.left),
+        y: (svgY * scaleY) + (svgRect.top - containerRect.top),
+        value: val
+    }
+}
+
+const hideTooltip = () => {
+    tooltip.value.show = false
+}
 
 const resizeObserver = new ResizeObserver(() => {
     if (svgRef.value) {
@@ -63,8 +88,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <div class="line-chart-container">
-
+    <div class="line-chart-container" ref="containerRef">
         <svg
             ref="svgRef"
             :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
@@ -81,7 +105,7 @@ onBeforeUnmount(() => {
                     :x2="svgWidth - padding"
                     :y1="getY(y, svgHeight)"
                     :y2="getY(y, svgHeight)"
-                    stroke="black"
+                    stroke="rgba(255,255,255,0.2)"
                 />
 
                 <line
@@ -91,7 +115,7 @@ onBeforeUnmount(() => {
                     :x2="getX(i - 1, svgWidth)"
                     :y1="padding"
                     :y2="svgHeight - padding"
-                    stroke="black"
+                    stroke="rgba(255,255,255,0.2)"
                 />
             </g>
 
@@ -121,7 +145,7 @@ onBeforeUnmount(() => {
                 :key="'ylabel'+i"
                 :x="padding - 10"
                 :y="getY(y, svgHeight) + 4"
-                font-size="10"
+                font-size="12"
                 fill="#fff"
                 text-anchor="end"
             >
@@ -134,7 +158,7 @@ onBeforeUnmount(() => {
                 :key="'xlabel'+i"
                 :x="getX(i, svgWidth)"
                 :y="svgHeight - padding + 15"
-                font-size="15"
+                font-size="12"
                 fill="#fff"
                 text-anchor="middle"
             >
@@ -155,6 +179,10 @@ onBeforeUnmount(() => {
                     rx="2"
                     ry="2"
                     opacity="0.7"
+                    @mouseover="showTooltipFromIndex(i, val)"
+                    @mousemove="showTooltipFromIndex(i, val)"
+                    @mouseout="hideTooltip"
+                    style="cursor: pointer;"
                 />
 
                 <!-- Ikkinchi bar (moviy) -->
@@ -165,18 +193,35 @@ onBeforeUnmount(() => {
                     :y="getY(0, svgHeight)"
                     :width="barWidth"
                     :height="getBarHeight(val / 2, svgHeight)"
-                fill="#008ffb"
-                rx="2"
-                ry="2"
-                opacity="0.7"
+                    fill="#008ffb"
+                    rx="2"
+                    ry="2"
+                    opacity="0.7"
+                    @mouseover="showTooltipFromIndex(i, val/2)"
+                    @mousemove="showTooltipFromIndex(i, val/2)"
+                    @mouseout="hideTooltip"
+                    style="cursor: pointer;"
                 />
             </g>
         </svg>
+
+        <div
+            v-if="tooltip.show"
+            class="tooltip"
+            :style="{
+                top: tooltip.y + 'px',
+                left: tooltip.x + 'px',
+                transform: 'translate(-50%, -100%)'
+            }"
+        >
+            {{ tooltip.value }}
+        </div>
     </div>
 </template>
 
 <style scoped>
 .line-chart-container {
+    position: relative; /* Bu muhim! */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -188,5 +233,30 @@ onBeforeUnmount(() => {
     box-sizing: border-box;
     overflow: hidden;
     border-radius: 0.5rem;
+}
+
+.tooltip {
+    position: absolute;
+    background: white;
+    color: black;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    padding: 20px 40px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+}
+
+.tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }
 </style>
