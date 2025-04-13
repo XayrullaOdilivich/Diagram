@@ -90,7 +90,7 @@ onBeforeUnmount(() => {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Aylana pastda joylashishi uchun */
+    justify-content: flex-start;
     align-items: center;
     top: -5%;
     padding: 0;
@@ -102,17 +102,17 @@ onBeforeUnmount(() => {
     height: 90%;
     max-width: 90%;
     max-height: 90%;
-    margin-top: 10px; /* Ranglar pastda joylashishi uchun */
+    margin-top: 10px;
 }
 
 .legend {
-    display: flex; /* Flexbox orqali ranglarni yonma-yon joylashtirish */
-    justify-content: center; /* Ranglarni markazga joylashtirish */
-    gap: 10px; /* Ranglar orasidagi masofa */
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     font-size: 13px;
     color: #ccc;
-    margin-bottom: 10px; /* Ranglar ro'yxati aylanadan yuqorida joylashadi */
-    flex-wrap: wrap; /* Ranglar responsiv bo'lib bir qatorga joylashadi */
+    margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .legend-item {

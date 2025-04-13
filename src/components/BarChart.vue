@@ -24,10 +24,10 @@ const getY = (val, height) => {
 // Bar diagramma uchun hisob-kitoblar
 const barWidth = computed(() => {
     const totalWidth = svgWidth.value - padding * 2
-    return (totalWidth / data.length) / 2.5 // 2 ta bar joylashishi uchun kichikroq qilamiz
+    return (totalWidth / data.length) / 2.5
 })
 
-const barGap = 2 // Bar orasidagi bo'shliq
+const barGap = 2
 
 const getBarX = (i, isSecondBar = false) => {
     const baseX = getX(i + 1, svgWidth.value) - barWidth.value / 2
@@ -64,6 +64,7 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="line-chart-container">
+
         <svg
             ref="svgRef"
             :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
@@ -80,7 +81,7 @@ onBeforeUnmount(() => {
                     :x2="svgWidth - padding"
                     :y1="getY(y, svgHeight)"
                     :y2="getY(y, svgHeight)"
-                    stroke="rgba(255,255,255,0.15)"
+                    stroke="black"
                 />
 
                 <line
@@ -90,7 +91,7 @@ onBeforeUnmount(() => {
                     :x2="getX(i - 1, svgWidth)"
                     :y1="padding"
                     :y2="svgHeight - padding"
-                    stroke="rgba(255,255,255,0.15)"
+                    stroke="black"
                 />
             </g>
 
@@ -133,7 +134,7 @@ onBeforeUnmount(() => {
                 :key="'xlabel'+i"
                 :x="getX(i, svgWidth)"
                 :y="svgHeight - padding + 15"
-                font-size="10"
+                font-size="15"
                 fill="#fff"
                 text-anchor="middle"
             >
@@ -183,6 +184,7 @@ onBeforeUnmount(() => {
     height: 100%;
     background-color: #161a26;
     padding: 0;
+    margin: 30px;
     box-sizing: border-box;
     overflow: hidden;
     border-radius: 0.5rem;

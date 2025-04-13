@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
                 :key="'ylabel'+i"
                 :x="padding - 10"
                 :y="getY(y, svgHeight) + 4"
-                font-size="20"
+                font-size="15"
                 fill="#fff"
                 text-anchor="end"
             >
@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
                 :key="'xlabel'+i"
                 :x="getX(i, svgWidth)"
                 :y="svgHeight - padding + 15"
-                font-size="20"
+                font-size="15"
                 fill="#fff"
                 text-anchor="middle"
             >
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
             <text
                 :x="padding - 10"
                 :y="svgHeight - padding + 15"
-                font-size="20"
+                font-size="15"
                 fill="#fff"
                 text-anchor="end"
             >
