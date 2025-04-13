@@ -1,17 +1,49 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watchEffect, onMounted, onUnmounted } from 'vue'
 import { GridLayout, GridItem } from 'vue3-grid-layout'
 import SparkLineChart from '@/components/SparkLine.vue'
 import SpiralChart from '@/components/SpiralChart.vue'
 import LineChart from "@/components/LineChart.vue"
 import BarChart from "@/components/BarChart.vue";
 
-const layout = ref([
+const layout = ref([])
+
+const defaultLayout = [
     { i: '1', x: 0, y: 0, w: 3, h: 4, name: 'Spark Line', static: true },
     { i: '2', x: 0, y: 0, w: 3, h: 8, name: 'Spiral Chart' },
     { i: '3', x: 3, y: 0, w: 9, h: 12, name: 'Line Chart' },
     { i: '4', x: 0, y: 4, w: 12, h: 12, name: 'Bar Chart' },
-])
+]
+
+const mobileLayout = [
+    { i: '1', x: 0, y: 0, w: 12, h: 3, name: 'Spark Line', static: true },
+    { i: '2', x: 0, y: 0, w: 12, h: 5, name: 'Spiral Chart' },
+    { i: '3', x: 0, y: 0, w: 12, h: 6, name: 'Line Chart' },
+    { i: '4', x: 0, y: 0, w: 12, h: 8, name: 'Bar Chart' },
+]
+
+watchEffect(() => {
+    if (window.innerWidth < 978) {
+        layout.value = mobileLayout
+    } else {
+        layout.value = defaultLayout
+    }
+})
+
+const updateLayout = () => {
+    layout.value = window.innerWidth < 978 ? mobileLayout : defaultLayout
+}
+
+onMounted(() => {
+    updateLayout()
+    window.addEventListener('resize', updateLayout)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', updateLayout)
+})
+
+
 </script>
 
 <template>
