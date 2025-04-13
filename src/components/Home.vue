@@ -6,8 +6,6 @@ import SpiralChart from '@/components/SpiralChart.vue'
 import LineChart from "@/components/LineChart.vue"
 import BarChart from "@/components/BarChart.vue";
 
-
-
 const layout = ref([
     { i: '1', x: 0, y: 0, w: 3, h: 4, name: 'Spark Line', static: false },
     { i: '2', x: 0, y: 0, w: 3, h: 8, name: 'Spiral Chart' },
@@ -54,14 +52,23 @@ const layout = ref([
         </div>
     </div>
 </template>
+
 <style scoped>
 .container {
     background: #161a26;
-    padding: 2rem 12rem;
+    padding: 1rem;
+}
+
+@media (min-width: 1024px) {
+    .container {
+        padding: 2rem 4rem;
+    }
 }
 
 .grid {
     background: black;
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
 
 .border {
@@ -73,6 +80,8 @@ const layout = ref([
     background-color: #161a26;
     color: white;
     text-align: center;
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
 
 .block-header {
@@ -81,8 +90,7 @@ const layout = ref([
     font-weight: bold;
     font-size: 14px;
     text-align: center;
-    border-radius: 0.2rem;
-
+    border-radius: 0.5rem 0.5rem 0 0;
 }
 
 .block-body {
@@ -91,7 +99,6 @@ const layout = ref([
     justify-content: center;
     align-items: center;
     padding: 0;
+    overflow: hidden;
 }
-
 </style>
-

@@ -62,7 +62,7 @@ onBeforeUnmount(() => {
                     :x2="svgWidth - padding"
                     :y1="getY(y, svgHeight)"
                     :y2="getY(y, svgHeight)"
-                    stroke="rgba(255,255,255,0.2)"
+                    stroke="black"
                 />
 
                 <line
@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
                     :x2="getX(i - 1, svgWidth)"
                     :y1="padding"
                     :y2="svgHeight - padding"
-                    stroke="rgba(255,255,255,0.2)"
+                    stroke="black"
                 />
             </g>
 
@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
                 :key="'ylabel'+i"
                 :x="padding - 10"
                 :y="getY(y, svgHeight) + 4"
-                font-size="10"
+                font-size="20"
                 fill="#fff"
                 text-anchor="end"
             >
@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
                 :key="'xlabel'+i"
                 :x="getX(i, svgWidth)"
                 :y="svgHeight - padding + 15"
-                font-size="10"
+                font-size="20"
                 fill="#fff"
                 text-anchor="middle"
             >
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
             <text
                 :x="padding - 10"
                 :y="svgHeight - padding + 15"
-                font-size="10"
+                font-size="20"
                 fill="#fff"
                 text-anchor="end"
             >

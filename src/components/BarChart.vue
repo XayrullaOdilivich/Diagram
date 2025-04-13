@@ -1,52 +1,95 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
+const padding = 30
 const data = [58, 90, -50, 20, -100, 60, 100, -70, 35, 0, 80, -85, 10, -40, 75, 90, -30, 25, 100, -90]
 const yValues = [-100, -50, 0, 50, 100]
 
-// Fixed viewBox o'lchamlari
-const viewBoxWidth = 400
-const viewBoxHeight = 200
-const padding = 30
-const barGap = 2
+const svgRef = ref(null)
+const svgWidth = ref(400)
+const svgHeight = ref(200)
 
+const getX = (i, width) => {
+    const totalWidth = width - padding * 2
+    return padding + (i / 21) * totalWidth
+}
+
+const getY = (val, height) => {
+    const maxVal = 100
+    const minVal = -100
+    const range = maxVal - minVal
+    return padding + ((maxVal - val) / range) * (height - padding * 2)
+}
+
+// Bar diagramma uchun hisob-kitoblar
 const barWidth = computed(() => {
-    const totalWidth = viewBoxWidth - padding * 2
-    return (totalWidth / data.length) - barGap
+    const totalWidth = svgWidth.value - padding * 2
+    return (totalWidth / data.length) / 2.5 // 2 ta bar joylashishi uchun kichikroq qilamiz
 })
 
-const getX = (i) => {
-    return padding + i * (barWidth.value + barGap)
+const barGap = 2 // Bar orasidagi bo'shliq
+
+const getBarX = (i, isSecondBar = false) => {
+    const baseX = getX(i + 1, svgWidth.value) - barWidth.value / 2
+    return isSecondBar ? baseX + barWidth.value + barGap : baseX
 }
 
-const getY = (val) => {
-    const range = 200 // -100 dan +100 gacha
-    return padding + ((100 - val) / range) * (viewBoxHeight - padding * 2)
-}
-
-const getBarHeight = (val) => {
-    const zeroY = getY(0)
-    const valY = getY(val)
+const getBarHeight = (val, height) => {
+    const zeroY = getY(0, height)
+    const valY = getY(val, height)
     return Math.abs(zeroY - valY)
 }
+
+const linePoints = computed(() => {
+    return data.map((val, i) => `${getX(i + 1, svgWidth.value)},${getY(val, svgHeight.value)}`).join(' ')
+})
+
+const resizeObserver = new ResizeObserver(() => {
+    if (svgRef.value) {
+        const width = svgRef.value.parentElement.offsetWidth
+        const height = svgRef.value.parentElement.offsetHeight
+        svgWidth.value = width
+        svgHeight.value = height
+    }
+})
+
+onMounted(() => {
+    resizeObserver.observe(svgRef.value.parentElement)
+})
+
+onBeforeUnmount(() => {
+    resizeObserver.disconnect()
+})
 </script>
 
 <template>
-    <div class="bar-chart-container">
+    <div class="line-chart-container">
         <svg
-            viewBox="0 0 400 200"
+            ref="svgRef"
+            :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
             preserveAspectRatio="xMidYMid meet"
-            class="chart-svg"
+            width="100%"
+            height="100%"
         >
             <!-- Grid lines -->
             <g class="grid-lines">
                 <line
                     v-for="(y, i) in yValues"
-                    :key="'yline'+i"
+                    :key="'y'+i"
                     :x1="padding"
-                    :x2="viewBoxWidth - padding"
-                    :y1="getY(y)"
-                    :y2="getY(y)"
+                    :x2="svgWidth - padding"
+                    :y1="getY(y, svgHeight)"
+                    :y2="getY(y, svgHeight)"
+                    stroke="rgba(255,255,255,0.15)"
+                />
+
+                <line
+                    v-for="i in 22"
+                    :key="'x'+i"
+                    :x1="getX(i - 1, svgWidth)"
+                    :x2="getX(i - 1, svgWidth)"
+                    :y1="padding"
+                    :y2="svgHeight - padding"
                     stroke="rgba(255,255,255,0.15)"
                 />
             </g>
@@ -56,7 +99,7 @@ const getBarHeight = (val) => {
                 :x1="padding"
                 :y1="padding"
                 :x2="padding"
-                :y2="viewBoxHeight - padding"
+                :y2="svgHeight - padding"
                 stroke="#aaa"
                 stroke-width="1.5"
             />
@@ -64,9 +107,9 @@ const getBarHeight = (val) => {
             <!-- X o'qi -->
             <line
                 :x1="padding"
-                :y1="getY(0)"
-                :x2="viewBoxWidth - padding"
-                :y2="getY(0)"
+                :y1="getY(0, svgHeight)"
+                :x2="svgWidth - padding"
+                :y2="getY(0, svgHeight)"
                 stroke="#aaa"
                 stroke-width="1.5"
             />
@@ -76,7 +119,7 @@ const getBarHeight = (val) => {
                 v-for="(y, i) in yValues"
                 :key="'ylabel'+i"
                 :x="padding - 10"
-                :y="getY(y) + 4"
+                :y="getY(y, svgHeight) + 4"
                 font-size="10"
                 fill="#fff"
                 text-anchor="end"
@@ -86,47 +129,62 @@ const getBarHeight = (val) => {
 
             <!-- X labels -->
             <text
-                v-for="i in data.length"
+                v-for="i in 20"
                 :key="'xlabel'+i"
-                :x="getX(i-1) + barWidth / 2"
-                :y="viewBoxHeight - padding + 15"
+                :x="getX(i, svgWidth)"
+                :y="svgHeight - padding + 15"
                 font-size="10"
                 fill="#fff"
                 text-anchor="middle"
             >
-                {{ i }}
+                {{ i - 1 }}
             </text>
 
-            <!-- Barlar -->
-            <rect
-                v-for="(val, i) in data"
-                :key="'bar'+i"
-                :x="getX(i)"
-                :y="val >= 0 ? getY(val) : getY(0)"
-                :width="barWidth"
-                :height="getBarHeight(val)"
-                :fill="val >= 0 ? '#00e396' : '#ff4560'"
+            <!-- Bar diagrammalar -->
+            <g class="bars">
+                <!-- Birinchi bar (yashil) -->
+                <rect
+                    v-for="(val, i) in data"
+                    :key="'bar1-'+i"
+                    :x="getBarX(i)"
+                    :y="val >= 0 ? getY(val, svgHeight) : getY(0, svgHeight)"
+                    :width="barWidth"
+                    :height="getBarHeight(val, svgHeight)"
+                    fill="#00e396"
+                    rx="2"
+                    ry="2"
+                    opacity="0.7"
+                />
+
+                <!-- Ikkinchi bar (moviy) -->
+                <rect
+                    v-for="(val, i) in data"
+                    :key="'bar2-'+i"
+                    :x="getBarX(i, true)"
+                    :y="getY(0, svgHeight)"
+                    :width="barWidth"
+                    :height="getBarHeight(val / 2, svgHeight)"
+                fill="#008ffb"
                 rx="2"
                 ry="2"
-            />
+                opacity="0.7"
+                />
+            </g>
         </svg>
     </div>
 </template>
 
 <style scoped>
-.bar-chart-container {
+.line-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
     height: 100%;
     background-color: #161a26;
-    border-radius: 1rem;
+    padding: 0;
+    box-sizing: border-box;
     overflow: hidden;
-    position: relative;
-}
-
-.chart-svg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
+    border-radius: 0.5rem;
 }
 </style>
