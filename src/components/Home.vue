@@ -7,7 +7,7 @@ import LineChart from "@/components/LineChart.vue"
 import BarChart from "@/components/BarChart.vue";
 
 const layout = ref([
-    { i: '1', x: 0, y: 0, w: 3, h: 4, name: 'Spark Line', static: false },
+    { i: '1', x: 0, y: 0, w: 3, h: 4, name: 'Spark Line', static: true },
     { i: '2', x: 0, y: 0, w: 3, h: 8, name: 'Spiral Chart' },
     { i: '3', x: 3, y: 0, w: 9, h: 12, name: 'Line Chart' },
     { i: '4', x: 0, y: 4, w: 12, h: 12, name: 'Bar Chart' },
