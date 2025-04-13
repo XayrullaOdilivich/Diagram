@@ -1,29 +1,41 @@
-# Unical
+# 📈 Responsive SVG Line Chart with Tooltip (Vue 3)
 
-This template should help get you started developing with Vue 3 in Vite.
+Interaktiv va moslashuvchan (responsive) SVG Line Chart Vue 3 yordamida yozilgan. Bu komponent real vaqt ma'lumotlarini yoki statistikani vizual ko‘rsatish uchun qulay bo‘lib, ustiga bosilganda tooltip (ko‘rsatkich) ko‘rinadi.
 
-## Recommended IDE Setup
+![screenshot](public/img/Screenshot.png) <!-- Rasmingizni loyihaga qo‘shing -->
+![screenshot](public/img/Screenshot_1.png) <!-- Rasmingizni loyihaga qo‘shing -->
+![screenshot](public/img/Screenshot_2.png) <!-- Rasmingizni loyihaga qo‘shing -->
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+---
 
-## Customize configuration
+## ✨ Asosiy imkoniyatlari
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- 📊 Chiroyli SVG asosida chizilgan Line Chart
+- 🖱 Tooltip (ko‘rsatkich) hover paytida ko‘rinadi
+- 📐 Responsive o‘lcham — ekran hajmiga moslashadi
+- 🧮 Grid liniyalar va etiketkalar
+- ⚡ Kompozitsiya API yordamida yozilgan (Vue 3)
 
-## Project Setup
+---
 
-```sh
+## 🛠 Texnologiyalar
+
+- [Vue 3](https://vuejs.org/)
+- Composition API
+- SVG
+- CSS (scoped)
+
+---
+
+## 🚀 O‘rnatish va ishga tushirish
+
+```bash
+# Klonlash
+git clone https://github.com/XayrullaOdilivich/Diagram.git
+cd your-repo-name
+
+# Paketlarni o‘rnatish
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
+# Lokal serverni ishga tushirish
 npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
